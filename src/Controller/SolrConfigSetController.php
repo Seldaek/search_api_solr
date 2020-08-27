@@ -305,14 +305,16 @@ class SolrConfigSetController extends ControllerBase {
       }
     }
 
-    $solrcore_properties['solr.luceneMatchVersion'] = $connector->getLuceneMatchVersion($this->assumedMinimumVersion ?: '');
-    // @todo
-    // $solrcore_properties['solr.replication.masterUrl']
-    $solrcore_properties_string = '';
-    foreach ($solrcore_properties as $property => $value) {
-      $solrcore_properties_string .= $property . '=' . $value . "\n";
+    $luceneMatchVersion = $solrcore_properties['solr.luceneMatchVersion'] = $connector->getLuceneMatchVersion($this->assumedMinimumVersion ?: '');
+    if (!$connector->isCloud()) {
+      // @todo
+      // $solrcore_properties['solr.replication.masterUrl']
+      $solrcore_properties_string = '';
+      foreach ($solrcore_properties as $property => $value) {
+        $solrcore_properties_string .= $property . '=' . $value . "\n";
+      }
+      $files['solrcore.properties'] = $solrcore_properties_string;
     }
-    $files['solrcore.properties'] = $solrcore_properties_string;
 
     // Now add all remaining static files from the conf dir that have not been
     // generated dynamically above.
@@ -332,8 +334,16 @@ class SolrConfigSetController extends ControllerBase {
       }
     }
 
-    $connector->alterConfigFiles($files, $solrcore_properties['solr.luceneMatchVersion'], $this->serverId);
-    $this->moduleHandler()->alter('search_api_solr_config_files', $files, $solrcore_properties['solr.luceneMatchVersion'], $this->serverId);
+    if ($connector->isCloud() && isset($files['solrconfig.xml'])) {
+      // solrcore.properties won’t work in SolrCloud mode (it is not read from
+      // ZooKeeper). Therefore we go for a more specific fallback to keep the
+      // possibility to set the property as parameter of the virtual machine.
+      // @see https://lucene.apache.org/solr/guide/8_6/configuring-solrconfig-xml.html
+      $files['solrconfig.xml'] = preg_replace('/solr.luceneMatchVersion:LUCENE_\d+/', 'solr.luceneMatchVersion:' . $luceneMatchVersion, $files['solrconfig.xml']);
+    }
+
+    $connector->alterConfigFiles($files, $luceneMatchVersion, $this->serverId);
+    $this->moduleHandler()->alter('search_api_solr_config_files', $files, $luceneMatchVersion, $this->serverId);
     return $files;
   }
 

@@ -1432,7 +1432,6 @@ class SearchApiSolrTest extends SolrBackendTestBase {
 
     $config_files = $solr_configset_controller->getConfigFiles();
     $this->assertStringContainsString('<jmx />', $config_files['solrconfig_extra.xml']);
-    $this->assertStringNotContainsString('solr.install.dir', $config_files['solrcore.properties']);
     $this->assertStringContainsString('text_en', $config_files['schema_extra_types.xml']);
     $this->assertStringNotContainsString('text_foo_en', $config_files['schema_extra_types.xml']);
     $this->assertStringNotContainsString('text_de', $config_files['schema_extra_types.xml']);
@@ -1457,6 +1456,7 @@ class SearchApiSolrTest extends SolrBackendTestBase {
       $this->assertStringNotContainsString('"/get"', $config_files['solrconfig_extra.xml']);
     }
     else {
+      $this->assertStringNotContainsString('solr.install.dir', $config_files['solrcore.properties']);
       $this->assertStringContainsString('solr.replication', $config_files['solrcore.properties']);
       $this->assertStringContainsString('"/replication"', $config_files[(version_compare($solr_major_version, '7', '>=')) ? 'solrconfig_extra.xml' : 'solrconfig.xml']);
       if (version_compare($solr_major_version, '7', '>=')) {

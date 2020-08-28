@@ -330,7 +330,7 @@ class StandardSolrCloudConnector extends StandardSolrConnector implements SolrCl
     }
 
     if (!empty($this->configuration['solr_install_dir'])) {
-      $files['solrconfig.xml'] = preg_replace("/{solr\.install\.dir:[^}]}/", '{solr.install.dir:' . $this->configuration['solr_install_dir'] . '}', $files['solrconfig.xml']);
+      $files['solrconfig.xml'] = preg_replace("/{solr\.install\.dir:[^}]*}/", '{solr.install.dir:' . $this->configuration['solr_install_dir'] . '}', $files['solrconfig.xml']);
     }
   }
 

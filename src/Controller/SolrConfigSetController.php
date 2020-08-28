@@ -305,8 +305,11 @@ class SolrConfigSetController extends ControllerBase {
       }
     }
 
-    $luceneMatchVersion = $solrcore_properties['solr.luceneMatchVersion'] = $connector->getLuceneMatchVersion($this->assumedMinimumVersion ?: '');
-    if (!$connector->isCloud()) {
+    $solrcore_properties['solr.luceneMatchVersion'] = $connector->getLuceneMatchVersion($this->assumedMinimumVersion ?: '');
+    if ($connector->isCloud()) {
+      unset($files['solrcore.properties']);
+    }
+    else {
       // @todo
       // $solrcore_properties['solr.replication.masterUrl']
       $solrcore_properties_string = '';
@@ -339,11 +342,11 @@ class SolrConfigSetController extends ControllerBase {
       // ZooKeeper). Therefore we go for a more specific fallback to keep the
       // possibility to set the property as parameter of the virtual machine.
       // @see https://lucene.apache.org/solr/guide/8_6/configuring-solrconfig-xml.html
-      $files['solrconfig.xml'] = preg_replace('/solr.luceneMatchVersion:LUCENE_\d+/', 'solr.luceneMatchVersion:' . $luceneMatchVersion, $files['solrconfig.xml']);
+      $files['solrconfig.xml'] = preg_replace('/solr.luceneMatchVersion:LUCENE_\d+/', 'solr.luceneMatchVersion:' . $solrcore_properties['solr.luceneMatchVersion'], $files['solrconfig.xml']);
     }
 
-    $connector->alterConfigFiles($files, $luceneMatchVersion, $this->serverId);
-    $this->moduleHandler()->alter('search_api_solr_config_files', $files, $luceneMatchVersion, $this->serverId);
+    $connector->alterConfigFiles($files, $solrcore_properties['solr.luceneMatchVersion'], $this->serverId);
+    $this->moduleHandler()->alter('search_api_solr_config_files', $files, $solrcore_properties['solr.luceneMatchVersion'], $this->serverId);
     return $files;
   }
 

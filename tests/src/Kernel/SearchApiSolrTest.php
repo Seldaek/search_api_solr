@@ -1550,7 +1550,6 @@ class SearchApiSolrTest extends SolrBackendTestBase {
       'accents_de.txt' => [
         ' Not needed if German2 Porter stemmer is used.'
       ],
-      'solrcore.properties' => [],
       'elevate.xml' => [],
       'schema.xml' => [],
       'solrconfig.xml' => [],

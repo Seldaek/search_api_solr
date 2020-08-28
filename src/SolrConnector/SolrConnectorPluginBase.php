@@ -1152,13 +1152,6 @@ abstract class SolrConnectorPluginBase extends ConfigurablePluginBase implements
     if (!empty($this->configuration['jmx'])) {
       $files['solrconfig_extra.xml'] .= "<jmx />\n";
     }
-
-    if (!empty($this->configuration['solr_install_dir']) && isset($files['solrcore.properties'])) {
-      $files['solrcore.properties'] = preg_replace("/solr\.install\.dir.*$/m", 'solr.install.dir=' . $this->configuration['solr_install_dir'], $files['solrcore.properties']);
-    }
-    else {
-      $files['solrcore.properties'] = preg_replace("/solr\.install\.dir.*$/m", '', $files['solrcore.properties']);
-    }
   }
 
 }

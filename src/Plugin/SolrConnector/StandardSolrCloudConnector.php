@@ -321,12 +321,15 @@ class StandardSolrCloudConnector extends StandardSolrConnector implements SolrCl
       $files['solrconfig.xml'] = preg_replace("@<requestHandler\s+name=\"/replication\".*?</requestHandler>@ms", '', $files['solrconfig.xml']);
       $files['solrconfig.xml'] = preg_replace("@<requestHandler\s+name=\"/get\".*?</requestHandler>@ms", '', $files['solrconfig.xml']);
     }
-    $files['solrcore.properties'] = preg_replace("/solr\.replication.*\n/", '', $files['solrcore.properties']);
 
     // Set the StatsCache.
     // @see https://lucene.apache.org/solr/guide/8_0/distributed-requests.html#configuring-statscache-distributed-idf
     if (!empty($this->configuration['stats_cache'])) {
       $files['solrconfig_extra.xml'] .= '<statsCache class="' . $this->configuration['stats_cache'] . '" />' . "\n";
+    }
+
+    if (!empty($this->configuration['solr_install_dir'])) {
+      $files['solrconfig.xml'] = preg_replace("/{solr\.install\.dir:[^}]}/", '{solr.install.dir:' . $this->configuration['solr_install_dir'] . '}', $files['solrconfig.xml']);
     }
   }
 

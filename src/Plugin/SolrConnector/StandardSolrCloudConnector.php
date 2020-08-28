@@ -5,6 +5,7 @@ namespace Drupal\search_api_solr\Plugin\SolrConnector;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\search_api_solr\SearchApiSolrException;
 use Drupal\search_api_solr\SolrCloudConnectorInterface;
+use Drupal\search_api_solr\SolrConnector\SolrConnectorPluginBase;
 use Drupal\search_api_solr\Utility\Utility;
 use Solarium\Core\Client\Endpoint;
 use Solarium\Exception\HttpException;
@@ -308,7 +309,7 @@ class StandardSolrCloudConnector extends StandardSolrConnector implements SolrCl
    * {@inheritdoc}
    */
   public function alterConfigFiles(array &$files, string $lucene_match_version, string $server_id = '') {
-    parent::alterConfigFiles($files, $lucene_match_version, $server_id);
+    SolrConnectorPluginBase::alterConfigFiles($files, $lucene_match_version, $server_id);
 
     // Leverage the implicit Solr request handlers with default settings for
     // Solr Cloud.

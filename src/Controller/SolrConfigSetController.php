@@ -306,10 +306,7 @@ class SolrConfigSetController extends ControllerBase {
     }
 
     $solrcore_properties['solr.luceneMatchVersion'] = $connector->getLuceneMatchVersion($this->assumedMinimumVersion ?: '');
-    if ($connector->isCloud()) {
-      unset($files['solrcore.properties']);
-    }
-    else {
+    if (!$connector->isCloud()) {
       // @todo
       // $solrcore_properties['solr.replication.masterUrl']
       $solrcore_properties_string = '';
@@ -343,6 +340,7 @@ class SolrConfigSetController extends ControllerBase {
       // possibility to set the property as parameter of the virtual machine.
       // @see https://lucene.apache.org/solr/guide/8_6/configuring-solrconfig-xml.html
       $files['solrconfig.xml'] = preg_replace('/solr.luceneMatchVersion:LUCENE_\d+/', 'solr.luceneMatchVersion:' . $solrcore_properties['solr.luceneMatchVersion'], $files['solrconfig.xml']);
+      unset($files['solrcore.properties']);
     }
 
     $connector->alterConfigFiles($files, $solrcore_properties['solr.luceneMatchVersion'], $this->serverId);
